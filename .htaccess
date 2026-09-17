@@ -1,0 +1,26 @@
+# Faith Gondolas - regras de seguranca do site publicado.
+# Site estatico: nao ha banco, formulario nem codigo rodando no servidor.
+# Estas linhas fecham o que sobra.
+
+<IfModule mod_headers.c>
+  # ninguem enquadra o site dentro de outra pagina (golpe de clique)
+  Header always set X-Frame-Options "DENY"
+  # o navegador respeita o tipo declarado e nao tenta adivinhar
+  Header always set X-Content-Type-Options "nosniff"
+  # o endereco da pagina nao vaza inteiro para outros sites
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # camera, microfone e localizacao ficam desligados
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  # so carrega o que vem do proprio site e as fontes do Google
+  Header always set Content-Security-Policy "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'"
+</IfModule>
+
+# nao listar o conteudo das pastas para quem digitar /img/
+Options -Indexes
+
+# fora do ar sem HTTPS: tudo passa para o endereco seguro
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
